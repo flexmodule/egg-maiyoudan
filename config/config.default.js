@@ -16,6 +16,13 @@ module.exports = appInfo => {
   config.keys = appInfo.name + '_1565586289293_3492';
   // add your middleware config here
   config.middleware = [];
+  config.cluster = {
+    listen: {
+      path: '',
+      port: 80,
+      hostname: '0.0.0.0',
+    }
+};
   console.log(process.pid)
   // add your user config here
   const userConfig = {
