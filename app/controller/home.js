@@ -5,7 +5,9 @@ const Controller = require('egg').Controller;
 class HomeController extends Controller {
   async index() {
     const { ctx } = this;
-    ctx.body = 'hi, egg我是宇宙无敌大帅哥';
+    const result = await ctx.model.Bussiness.findAll();
+            console.log(result);
+    ctx.body = result;
   }
 }
 

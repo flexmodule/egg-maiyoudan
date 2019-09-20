@@ -7,43 +7,45 @@ function toInt(str) {
   if (!str) return str;
   return parseInt(str, 10) || 0;
 }
-class UserController extends Controller {
+class MerchantController extends Controller {
   async index() {
     const { ctx } = this;
     let offset = (toInt(ctx.query.page) - 1) * toInt(ctx.query.limit)
     let sqlquery = {};
-    const Op = ctx.app.Sequelize.Op;
+    const Op = ctx.app.Sequelize.Op
     if (ctx.query.id) {
       sqlquery.id = ctx.query.id
     }
     if (ctx.query.merchantcode) {
       sqlquery.merchantcode = ctx.query.merchantcode
     }
-    if (ctx.query.retailcode) {
-      sqlquery.retailcode = ctx.query.retailcode
+    if (ctx.query.status) {
+      sqlquery.status = ctx.query.status
     }
-    if (ctx.query.usercode) {
-      sqlquery.usercode = ctx.query.usercode
+    if (ctx.query.type) {
+      sqlquery.type = ctx.query.type
     }
-    if (ctx.query.sex) {
-      sqlquery.sex = ctx.query.sex
-    }
-    if (ctx.query.nikeName) {
-      sqlquery.nikename = {
-        [Op.like]: `%${ctx.query.nikeName}%`,
+    if (ctx.query.name) {
+      sqlquery.name = {
+        [Op.like]: `%${ctx.query.name}%`,
       }
     }
-    if (ctx.query.province) {
-      sqlquery.province = {
-        [Op.like]: `%${ctx.query.province}%`,
+    if (ctx.query.pcd) {
+      sqlquery.pcd = {
+        [Op.like]: `%${ctx.query.pcd}%`,
       }
     }
-    if (ctx.query.city) {
-      sqlquery.city = {
-        [Op.like]: `%${ctx.query.city}%`,
+    if (ctx.query.master) {
+      sqlquery.master = {
+        [Op.like]: `%${ctx.query.master}%`,
       }
     }
-    const result = await ctx.model.User.findAndCountAll({
+    if (ctx.query.mall) {
+      sqlquery.mall = {
+        [Op.like]: `%${ctx.query.mall}%`,
+      }
+    }
+    const result = await ctx.model.Merchant.findAndCountAll({
       where: sqlquery,
       offset: offset,
       limit: toInt(ctx.query.limit)
@@ -54,23 +56,23 @@ class UserController extends Controller {
     }
     ctx.body = data;
   }
-  async userauth() {
+  async addmerchant() {
     const { ctx } = this;
     const { name,description,type,status,mainphoto,tel,master,busshours,pcd,address,mall,longitude,latitude } = ctx.request.body;
     let merchantcode=uuid.v1();
-    const Merchant = await ctx.model.User.create({ name,description,type,status,mainphoto,tel,master,busshours,pcd,address,mall,longitude,latitude,merchantcode });
+    const Merchant = await ctx.model.Merchant.create({ name,description,type,status,mainphoto,tel,master,busshours,pcd,address,mall,longitude,latitude,merchantcode });
     let data = {
       code: 0,
       msg: '操作成功'
     }
     ctx.body = data;
   }
-  async modifyismerchant() {
+  async modifymerchant() {
     const { ctx } = this;
     const id = toInt(ctx.query.id);
     let data;
-    const user = await ctx.model.User.findByPk(id);
-    if (!user) {
+    const merchant = await ctx.model.Merchant.findByPk(id);
+    if (!merchant) {
       data = {
         code: 404,
         msg: '未找到记录'
@@ -78,20 +80,20 @@ class UserController extends Controller {
       ctx.body = data;
       return;
     }
-    const { ismerchant,merchantcode } = ctx.request.body;
-    const User = await user.update({ ismerchant,merchantcode });
+    const { name,description,type,status,mainphoto,tel,master,busshours,pcd,address,mall,longitude,latitude } = ctx.request.body;
+    const Merchant = await merchant.update({name,description,type,status,mainphoto,tel,master,busshours,pcd,address,mall,longitude,latitude});
     data = {
       code: 0,
       msg: '操作成功'
     }
     ctx.body = data;
   }
-  async modifyisretail() {
+  async modifymerchantstatus() {
     const { ctx } = this;
     const id = toInt(ctx.query.id);
     let data;
-    const user = await ctx.model.User.findByPk(id);
-    if (!user) {
+    const merchant = await ctx.model.Merchant.findByPk(id);
+    if (!merchant) {
       data = {
         code: 404,
         msg: '未找到记录'
@@ -99,20 +101,20 @@ class UserController extends Controller {
       ctx.body = data;
       return;
     }
-    const { isretail,retailcode } = ctx.request.body;
-    const User = await user.update({ isretail,retailcode });
+    const { status } = ctx.request.body;
+    const Merchant = await merchant.update({ status });
     data = {
       code: 0,
       msg: '操作成功'
     }
     ctx.body = data;
   }
-  async deleteuser() {
+  async deletemerchant() {
     const { ctx } = this;
     const id = toInt(ctx.query.id);
     let data;
-    const user = await ctx.model.User.findByPk(id);
-    if (!user) {
+    const merchant = await ctx.model.Merchant.findByPk(id);
+    if (!merchant) {
       data = {
         code: 404,
         msg: '未找到记录'
@@ -120,7 +122,7 @@ class UserController extends Controller {
       ctx.body = data;
       return;
     }
-    await user.destroy();
+    await merchant.destroy();
     data = {
       code: 0,
       msg: '操作成功'
@@ -129,4 +131,4 @@ class UserController extends Controller {
   }
 }
 
-module.exports = UserController;
+module.exports = MerchantController;
